@@ -18,10 +18,6 @@ const STATUS_ROW: Record<DutyStatus, number> = { OFF: 0, SB: 1, D: 2, ON: 3 }
 export default function LogSheet({ log, driver }: Props) {
   const { header, segments, totals, recap, remarks } = log
 
-  // Build duty line points for the SVG. Each segment becomes a horizontal line
-  // at its row level, with vertical connectors between segments at status change.
-  const dutyPath = useMemo(() => buildDutyPath(segments), [segments])
-
   return (
     <div className="bg-white border border-border rounded-card shadow-card overflow-hidden">
       {/* Card header */}
@@ -41,7 +37,7 @@ export default function LogSheet({ log, driver }: Props) {
         <HeaderGrid header={header} totals={totals} driver={driver} />
 
         {/* The Grid — 4 rows × 24h with duty line */}
-        <LogGrid segments={segments} totals={totals} dutyPath={dutyPath} />
+        <LogGrid segments={segments} totals={totals} />
 
         {/* Bottom two-column */}
         <div className="grid md:grid-cols-2 gap-4">
@@ -151,60 +147,110 @@ function Field({ label, value, highlight = false }: { label: string; value: stri
 }
 
 // -------------------------------------------------------- the grid
-function LogGrid({ segments, totals, dutyPath }: { segments: DaySegment[]; totals: DailyLog['totals']; dutyPath: string }) {
-  // Time axis labels: midnight, 1-11, NOON, 1-11, midnight
-  const timeLabels = ['midnight', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'NOON', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'midnight']
-  const STATUS_ROWS: DutyStatus[] = ['OFF', 'SB', 'D', 'ON']
+const ROW_H = 48             // px height per status row
+const ROW_COUNT = 4
+const GRID_H = ROW_H * ROW_COUNT   // 192px
+const STATUS_ROWS: DutyStatus[] = ['OFF', 'SB', 'D', 'ON']
+const STATUS_Y: Record<DutyStatus, number> = { OFF: 24, SB: 72, D: 120, ON: 168 }
+
+function LogGrid({ segments, totals }: { segments: DaySegment[]; totals: DailyLog['totals'] }) {
+  // Build the continuous duty path (using absolute pixel coordinates so the
+  // line stays crisp regardless of viewport width).
+  // viewBox is 100 wide x GRID_H tall (192). X uses 0-100 scale.
+  const pathData = useMemo(() => buildContinuousDutyPath(segments), [segments])
 
   return (
     <div className="border border-border rounded-btn overflow-hidden">
-      {/* Time axis (black bar) */}
-      <div className="bg-navy text-white flex items-center justify-between text-[10px] font-semibold tracking-wide">
-        <div className="px-2 w-[120px] flex-shrink-0 border-r border-white/10">midnight</div>
-        <div className="flex-1 grid grid-cols-24 gap-0 px-0">
+      {/* Time axis (navy bar) */}
+      <div className="bg-navy text-white flex items-stretch text-[10px] font-semibold tracking-wide">
+        <div className="px-2 w-[120px] flex-shrink-0 border-r border-white/10 flex items-center">midnight</div>
+        <div className="flex-1 grid grid-cols-24 gap-0">
           {Array.from({ length: 24 }, (_, i) => (
-            <div key={i} className="text-center tnum border-r border-white/10 last:border-r-0 py-1">
+            <div key={i} className="text-center tnum border-r border-white/10 last:border-r-0 py-1 flex items-center justify-center">
               {i === 0 ? 'MID' : i === 12 ? 'NOON' : i < 12 ? `${i}` : `${i - 12}`}
             </div>
           ))}
         </div>
-        <div className="px-2 flex-shrink-0 border-l border-white/10 text-right">
+        <div className="px-2 w-[80px] flex-shrink-0 border-l border-white/10 text-right flex flex-col justify-center">
           <div className="leading-tight">Miles</div>
           <div className="leading-tight">Total Hrs</div>
         </div>
       </div>
 
-      {/* 4 status rows + the duty line as an SVG overlay */}
-      <div className="relative">
-        {/* Row backgrounds */}
-        {STATUS_ROWS.map((status) => (
-          <div key={status} className="flex border-b border-border last:border-b-0 h-12">
-            <div className="w-[120px] flex-shrink-0 px-2 py-1.5 border-r border-border bg-canvas flex flex-col justify-center">
-              <div className="text-[11px] font-bold text-navy">{STATUS_LABEL[status]}</div>
+      {/* Grid body: labels column + grid area + totals column */}
+      <div className="flex">
+        {/* Left labels column */}
+        <div className="w-[120px] flex-shrink-0 border-r border-border bg-canvas">
+          {STATUS_ROWS.map((status) => (
+            <div key={status} className="h-12 px-2 py-1.5 border-b border-border last:border-b-0 flex flex-col justify-center">
+              <div className="text-[10px] font-bold text-navy leading-tight">{STATUS_LABEL[status]}</div>
             </div>
-            {/* Hour cells */}
-            <div className="relative flex-1">
-              {/* Hour grid lines */}
-              <div className="absolute inset-0 grid grid-cols-24">
-                {Array.from({ length: 24 }, (_, i) => (
-                  <div key={i} className="border-r border-border/60 last:border-r-0 relative">
-                    {/* 15-min subdivision lines */}
-                    <div className="absolute left-1/4 top-0 bottom-0 w-px bg-border/30" />
-                    <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/30" />
-                    <div className="absolute left-3/4 top-0 bottom-0 w-px bg-border/30" />
-                  </div>
-                ))}
+          ))}
+        </div>
+
+        {/* Grid area (relative so SVG overlay sits on top of the row backgrounds) */}
+        <div className="relative flex-1" style={{ height: GRID_H }}>
+          {/* Row background stripes (alternating) */}
+          {STATUS_ROWS.map((_, i) => (
+            <div key={i} className="absolute left-0 right-0 border-b border-border last:border-b-0"
+                 style={{ top: i * ROW_H, height: ROW_H, background: i % 2 === 0 ? '#FFFFFF' : '#F8FAFC' }} />
+          ))}
+          {/* Hour grid lines (24 cols × 4 sub-divisions) */}
+          <div className="absolute inset-0 grid grid-cols-24">
+            {Array.from({ length: 24 }, (_, i) => (
+              <div key={i} className="border-r border-border/60 last:border-r-0 relative">
+                <div className="absolute left-1/4 top-0 bottom-0 w-px bg-border/30" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/30" />
+                <div className="absolute left-3/4 top-0 bottom-0 w-px bg-border/30" />
               </div>
-              {/* The duty line for this row only */}
-              <DutyLineForRow segments={segments} status={status} />
-            </div>
-            {/* Row totals */}
-            <div className="w-[80px] flex-shrink-0 px-2 py-1.5 border-l border-border bg-canvas text-right text-xs">
-              <div className="font-bold tnum text-ink">{status === 'D' ? totals.miles.toFixed(0) : '—'}</div>
-              <div className="text-muted tnum">{hoursForStatus(status, totals)}h</div>
-            </div>
+            ))}
           </div>
-        ))}
+          {/* The continuous duty line — SVG overlay covering all 4 rows */}
+          <svg
+            className="absolute inset-0 pointer-events-none"
+            preserveAspectRatio="none"
+            viewBox={`0 0 100 ${GRID_H}`}
+            style={{ width: '100%', height: GRID_H }}
+          >
+            {/* Light tint behind each segment matching its row */}
+            {segments.map((s, i) => {
+              const x1 = (s.start_min / 1440) * 100
+              const x2 = (s.end_min / 1440) * 100
+              const rowIdx = STATUS_ROW[s.status]
+              return (
+                <rect key={`bg-${i}`} x={x1} y={rowIdx * ROW_H} width={Math.max(0.05, x2 - x1)}
+                      height={ROW_H} fill={statusColor(s.status)} opacity={0.08} />
+              )
+            })}
+            {/* The continuous duty line itself */}
+            {pathData && (
+              <path d={pathData} stroke={DUTY_LINE_COLOR} strokeWidth={0.9}
+                    fill="none" strokeLinejoin="miter" strokeLinecap="square" vectorEffect="non-scaling-stroke" />
+            )}
+            {/* Dots at each duty-change point (the corners of the line) */}
+            {segments.map((s, i) => {
+              const x = (s.start_min / 1440) * 100
+              const y = STATUS_Y[s.status]
+              return <circle key={`d-${i}`} cx={x} cy={y} r={0.7} fill={DUTY_LINE_COLOR} vectorEffect="non-scaling-stroke" />
+            })}
+            {/* Final dot at end of last segment */}
+            {segments.length > 0 && (() => {
+              const last = segments[segments.length - 1]
+              return <circle cx={(last.end_min / 1440) * 100} cy={STATUS_Y[last.status]} r={0.7}
+                             fill={DUTY_LINE_COLOR} vectorEffect="non-scaling-stroke" />
+            })()}
+          </svg>
+        </div>
+
+        {/* Right totals column */}
+        <div className="w-[80px] flex-shrink-0 border-l border-border bg-canvas">
+          {STATUS_ROWS.map((status) => (
+            <div key={status} className="h-12 px-2 py-1.5 border-b border-border last:border-b-0 text-right">
+              <div className="font-bold tnum text-ink text-xs">{status === 'D' ? totals.miles.toFixed(0) : '—'}</div>
+              <div className="text-muted tnum text-xs">{hoursForStatus(status, totals)}h</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Footer */}
@@ -219,46 +265,36 @@ function LogGrid({ segments, totals, dutyPath }: { segments: DaySegment[]; total
   )
 }
 
-// SVG duty line for a single row (drawn within the row's flex-1 area)
-function DutyLineForRow({ segments, status }: { segments: DaySegment[]; status: DutyStatus }) {
-  // Filter segments matching this row's status
-  const rowSegments = segments.filter((s) => s.status === status)
-  if (rowSegments.length === 0) return null
-
-  // Width per minute (in % of the row's flex-1 area)
-  const W_PER_MIN = 100 / 1440
-
-  return (
-    <svg
-      className="absolute inset-0 pointer-events-none"
-      preserveAspectRatio="none"
-      viewBox="0 0 100 100"
-      style={{ width: '100%', height: '100%' }}
-    >
-      {rowSegments.map((s, i) => {
-        const x1 = s.start_min * W_PER_MIN
-        const x2 = s.end_min * W_PER_MIN
-        return (
-          <g key={i}>
-            {/* Filled bar for the duty segment */}
-            <rect
-              x={x1}
-              y={20}
-              width={Math.max(0.2, x2 - x1)}
-              height={60}
-              fill={statusColor(status)}
-              opacity={0.85}
-            />
-            {/* Start dot */}
-            <circle cx={x1} cy={50} r={1.2} fill={statusColor(status)} />
-            {/* End dot */}
-            <circle cx={x2} cy={50} r={1.2} fill={statusColor(status)} />
-          </g>
-        )
-      })}
-    </svg>
-  )
+// Build the continuous duty line path (the classic paper-log line that crosses rows).
+// Returns an SVG path string. X scale = 0-100 (matching viewBox); Y is in pixels 0-GRID_H.
+function buildContinuousDutyPath(segments: DaySegment[]): string {
+  if (segments.length === 0) return ''
+  // Sort by start_min (segments should already be sorted, but defensive)
+  const sorted = [...segments].sort((a, b) => a.start_min - b.start_min)
+  let d = ''
+  sorted.forEach((s, i) => {
+    const x1 = (s.start_min / 1440) * 100
+    const x2 = (s.end_min / 1440) * 100
+    const y = STATUS_Y[s.status]
+    if (i === 0) {
+      // Move to the start of the first segment
+      d += `M ${x1.toFixed(4)} ${y} `
+    } else {
+      // Vertical connector from previous segment's end y to this segment's y at x1
+      const prevY = STATUS_Y[sorted[i - 1].status]
+      if (prevY !== y) {
+        d += `L ${x1.toFixed(4)} ${prevY} L ${x1.toFixed(4)} ${y} `
+      } else {
+        d += `L ${x1.toFixed(4)} ${y} `
+      }
+    }
+    // Horizontal line to the end of this segment
+    d += `L ${x2.toFixed(4)} ${y} `
+  })
+  return d.trim()
 }
+
+const DUTY_LINE_COLOR = '#0B2545'
 
 function statusColor(status: DutyStatus): string {
   switch (status) {
@@ -279,21 +315,6 @@ function hoursForStatus(status: DutyStatus, totals: DailyLog['totals']): number 
 }
 
 // -------------------------------------------------------- helpers
-function buildDutyPath(segments: DaySegment[]): string {
-  // Returns an SVG path string for the continuous duty line.
-  // Currently unused (we render per-row rects instead), but kept for
-  // future "single continuous line" rendering option.
-  if (segments.length === 0) return ''
-  let d = ''
-  segments.forEach((s) => {
-    const y = STATUS_ROW[s.status] * 25 + 12.5
-    const x1 = (s.start_min / 1440) * 100
-    const x2 = (s.end_min / 1440) * 100
-    d += `M ${x1} ${y} L ${x2} ${y} `
-  })
-  return d
-}
-
 function formatMin(min: number): string {
   const h = Math.floor(min / 60)
   const m = Math.floor(min % 60)
