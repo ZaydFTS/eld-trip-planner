@@ -54,15 +54,15 @@ Refresh the GitHub repo page. You should see:
 ### 2b. Get your backend URL
 
 When deployment finishes, Render gives you a URL like:
-`https://eld-trip-planner-api.onrender.com`
+`https://eld-trip-planner-api-mbbb.onrender.com`
 
 ### 2c. Verify the backend
 
 ```bash
-curl https://eld-trip-planner-api.onrender.com/api/health
+curl https://eld-trip-planner-api-mbbb.onrender.com/api/health
 # → {"status":"ok","service":"eld-trip-planner-backend","version":"1.0"}
 
-curl -X POST https://eld-trip-planner-api.onrender.com/api/plan \
+curl -X POST https://eld-trip-planner-api-mbbb.onrender.com/api/plan \
   -H "Content-Type: application/json" \
   -d '{"current_location":"Chicago, IL","pickup_location":"Joliet, IL","dropoff_location":"Detroit, MI","current_cycle_used_hours":35}'
 # → 100KB+ of JSON with route, schedule, daily_logs, summary
@@ -96,7 +96,7 @@ Under **Environment Variables**, add:
 
 | Name | Value |
 |---|---|
-| `VITE_API_BASE` | `https://eld-trip-planner-api.onrender.com` (your Render URL from step 2b) |
+| `VITE_API_BASE` | `https://eld-trip-planner-api-mbbb.onrender.com` (your Render URL from step 2b) |
 
 ### 3d. Deploy
 
@@ -124,7 +124,7 @@ Visit your Vercel URL in a browser:
 4. ✅ Try LA → Phoenix → Houston with cycle = 20 → 3 days of logs
 
 If anything fails:
-- Backend not reachable → check Render logs, verify `ALLOWED_HOSTS` includes `eld-trip-planner-api.onrender.com`
+- Backend not reachable → check Render logs, verify `ALLOWED_HOSTS` includes `eld-trip-planner-api-mbbb.onrender.com`
 - CORS errors → verify `CORS_ALLOWED_ORIGINS` on Render includes your Vercel URL
 - Map not loading → check browser console, OpenStreetMap tiles should load from `tile.openstreetmap.org`
 
@@ -168,4 +168,4 @@ Collect the $100 reward.
 ### Frontend (Vercel)
 | Var | Required | Example |
 |---|---|---|
-| `VITE_API_BASE` | ✅ | `https://eld-trip-planner-api.onrender.com` |
+| `VITE_API_BASE` | ✅ | `https://eld-trip-planner-api-mbbb.onrender.com` |

@@ -8,7 +8,7 @@ A full-stack app that takes trip details (current location, pickup, dropoff, cur
 ## Live demo
 
 - Frontend: https://eld-trip-planner.vercel.app
-- Backend API: https://eld-trip-planner-api.onrender.com/api/health
+- Backend API: https://eld-trip-planner-api-mbbb.onrender.com/api/health
 
 ## Quick start (local)
 
