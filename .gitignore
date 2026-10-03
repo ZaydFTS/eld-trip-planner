@@ -29,3 +29,12 @@ dist/
 # Local dev
 .env.local
 .env.*.local
+
+# Build artifacts (collectstatic output)
+eld_backend/staticfiles/
+eld_backend/static/
+
+# Sandboxed env
+django.log
+vite.log
+
