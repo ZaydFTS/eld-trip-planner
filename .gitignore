@@ -38,3 +38,17 @@ eld_backend/static/
 django.log
 vite.log
 
+
+# Sandbox / dev artifacts (not part of the project)
+.env
+upload/
+skills/
+*.sqlite3
+eld_backend/db.sqlite3
+
+# Logs
+django.log
+vite.log
+
+# OS
+.DS_Store
