@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Layout & Structure**\n*   **Type:** Single-page, centered-column web application (SaaS dashboard style).\n*   **Background:** Light gray/off-white (`#F9FAFB`).\n*   **Container:** A central white card/panel containing the main form, flanked by header and footer sections.\n\n**App Bar (Header)**\n*   **Left:** Logo icon + Bold text \"**ELD Trip Planner**\".\n*   **Navigation Tabs:** \"Route Planner\" (Active, light blue background), \"HOS Logs\", \"FMCSA Compliance\", \"Manifest\".\n*   **Right Side Elements:**\n    *   **KPI Badge:** Orange dot + \"**70hr / 8-day cycle**\".\n    *   **Help Link:** Info icon + \"How it works\".\n    *   **User Profile:** Avatar placeholder + Name \"**James Carter**\" / ID \"**IL-TRK-4471**\".\n    *   **User Icon:** Dark circular button with a white person silhouette.\n\n**Sub-Header (View Switcher)**\n*   **Left:** Slider icon + \"**SIMULATOR VIEW**\" (Bold).\n*   **Right (Pill Toggle):** \"**Normal Input**\" (Active/White), \"Validation Error\", \"Loading Skeleton\".\n\n**Main Content Panel**\n*   **Compliance Badge:** Small orange dot + \"**US FMCSA 49 CFR §395 COMPLIANT**\" (Light blue background).\n*   **Headline:** Large bold text: \"**Plan a compliant trip**\".\n*   **Sub-headline:** Gray descriptive text about mapping routes and generating logs.\n\n**Form Inputs (Inside the Card)**\n1.  **Current Location:**\n    *   Label: Location pin icon + \"**Current location**\". Right label: \"*Origin checkpoint*\".\n    *   Input: Pin icon + \"**Chicago, IL (Terminal 4)**\".\n    *   Tags (Frequent): \"Midwest Yard · Chicago, IL\", \"O'Hare Logistics Park\", \"Gary, IN Depot\".\n2.  **Pickup Location:**\n    *   Label: Clipboard icon + \"**Pickup location**\". Right badge: \"**Pickup · 1 hr dwell**\" (Blue).\n    *   Input: Warehouse icon + \"**Joliet, IL — Amazon MDW2**\".\n3.  **Dropoff Location:**\n    *   Label: Flag icon + \"**Dropoff location**\". Right badge: \"**Dropoff · 1 hr dwell**\" (Blue).\n    *   Input: Flag icon + \"**Detroit, MI — GM Assembly**\".\n4.  **Current Cycle Used (8-Day Window):**\n    *   Label: Clock icon + \"**Current Cycle Used (8-Day Window)**\".\n    *   Subtext: \"Hours already logged against the 70h regulatory maximum\".\n    *   **Control:** Minus (-) button | Value \"**35.0**\" | Plus (+) button.\n    *   **Progress Bar:** Orange fill (50%) on a light blue track.\n    *   **Axis Labels:** \"0h logged\" (Left), \"**35.0 hrs available this cycle (50% remaining)**\" (Center, orange text), \"70h cap\" (Right).\n\n**Form Actions**\n*   **Left:** Refresh icon + \"**Clear form**\" (Text link).\n*   **Right:** Primary CTA Button (Orange) — \"**Generate route & logs →**\".\n\n**Sample Routes Section (\"TRY A SAMPLE ROUTE\")**\n*   **Header:** Beaker icon + \"**TRY A SAMPLE ROUTE**\". Right text: \"Instant Telematics Benchmarks\".\n*   **Cards (3 columns):**\n    1.  \"**Midwest Intermodal**\": Chicago, IL → Detroit, MI (282 mi · 1-day run). Arrow icon.\n    2.  \"**Texas Gulf Express**\": Dallas, TX → Houston, TX (239 mi · Short haul). Arrow icon.\n    3.  \"**I-10 Southwest**\": Los Angeles, CA → Phoenix, AZ (372 mi · Desert corridor). Arrow icon.\n\n**Feature Highlights (Bottom Panel)**\n*   Light blue background panel with three columns:\n    1.  **Truck Icon - Property-Carrying CMV:** \"70hr / 8-day cycle with automatic 34-hr restarts\".\n    2.  **Fuel Pump Icon - Automated Refueling:** \"Triggered every 1,000 miles (15min dwell on duty)\".\n    3.  **Hourglass Icon - Dwell Constraints:** \"1hr pickup & drop-off dwell time automatically scheduled\".\n*   **Footer Note:** \"Assumes standard driving conditions...\" + Checkmark icon + \"**FMCSA Part 395**\".\n\n**Footer Bar**\n*   **Left:** Blue dot + \"**Telematics Engine v4.19 · US FMCSA 49 CFR Part 395 Verified**\".\n*   **Right:** \"© 2024 ELD Trip Planner SaaS. All operational telematics rights reserved.\"\n\n**Visual Style & Typography**\n*   **Font:** Clean sans-serif (Inter or similar).\n*   **Colors:**\n    *   Primary Action: Vibrant Orange (`#F59E0B`).\n    *   Active States/Links: Soft Blue (`#DBEAFE` background, `#1D4ED8` text).\n    *   Text: Dark Slate (`#111827`) for headings, Gray (`#6B7280`) for body.\n*   **Icons:** Outline style (Heroicons or similar), consistent stroke width.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1791058390,
+  "id": "2026100404124520c2f7296dc9487f",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "2026100404124520c2f7296dc9487f",
+  "usage": {
+    "completion_tokens": 1171,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2995,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 4166
+  }
+}
