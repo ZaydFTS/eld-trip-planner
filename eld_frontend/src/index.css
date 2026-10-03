@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body { font-family: 'Inter', system-ui, sans-serif; }
+  body { background: #F8FAFC; color: #0F172A; }
+  .tnum { font-feature-settings: 'tnum' 1; font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-btn bg-navy text-white font-semibold text-sm
+           hover:bg-navy-light active:bg-navy-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-amber {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-btn bg-amber text-navy font-semibold text-sm
+           hover:brightness-95 active:brightness-90 transition disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-btn bg-white text-navy font-medium text-sm border border-border-strong
+           hover:bg-canvas transition;
+  }
+  .input {
+    @apply w-full h-11 px-3 rounded-btn border border-border-strong bg-white text-ink text-sm
+           focus:outline-none focus:border-steel focus:ring-2 focus:ring-steel/15 transition;
+  }
+  .label-cap {
+    @apply text-[10px] font-bold tracking-[0.05em] uppercase text-muted;
+  }
+  .card {
+    @apply bg-white border border-border rounded-card shadow-card;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-chip px-2 py-1 text-[11px] font-semibold;
+  }
+}
+
+.leaflet-container { font-family: 'Inter', sans-serif; font-size: 12px; background: #E5EEFF; }
+.leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(11,37,69,0.08); }
+
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
