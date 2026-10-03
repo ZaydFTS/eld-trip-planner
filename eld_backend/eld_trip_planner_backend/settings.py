@@ -29,16 +29,23 @@ if _render_host:
 
 # --- CORS (frontend origins allowed to call this API) ---
 # Comma-separated list of allowed origins in production.
+def _clean_origins(raw: str) -> list:
+    """Strip whitespace and trailing slashes; drop empties. CORS origins
+    must be bare scheme+host (no path, no trailing /)."""
+    out = []
+    for o in raw.split(','):
+        o = o.strip().rstrip('/').strip()
+        if o:
+            out.append(o)
+    return out
+
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = [
-        o.strip() for o in os.environ.get(
-            'CORS_ALLOWED_ORIGINS',
-            'https://eld-trip-planner.vercel.app'
-        ).split(',') if o.strip()
-    ]
+    CORS_ALLOWED_ORIGINS = _clean_origins(
+        os.environ.get('CORS_ALLOWED_ORIGINS', 'https://eld-trip-planner.vercel.app')
+    )
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r'^https://.*\.vercel\.app$',
     ]
